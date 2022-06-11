@@ -28,7 +28,7 @@ struct Form2D {
     static void staticDelete(void);
 
     void init(auto&) {}
-    void update(auto& e) {
+    void update([[maybe_unused]] auto& e) {
         /*auto& transform = e.template getComponent<Transform2D>();
         if (transform.changed) {
             *pos_it = transform.position;

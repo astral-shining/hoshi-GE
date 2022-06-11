@@ -118,7 +118,7 @@ public:
 
     void pop_back() {
         (*this)[size_--].~T();
-        if (int c = (capacity_/4); capacity_ > min_capacity_ && size_ == c) {
+        if (uint32_t c = (capacity_/4); capacity_ > min_capacity_ && size_ == c) {
             shrink();
         }
     }

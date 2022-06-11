@@ -79,9 +79,8 @@ struct EntityManager {
     template<typename... Ts>
     auto& createEntity(Ts&&... args) {
         auto& e = entities.emplace_back(std::forward<Ts>(args)...);
-        e.id = entities.size()-1;
+        //e.id = entities.size()-1;
         e.initComponents();
-        e.init();
         return e;
     }
 

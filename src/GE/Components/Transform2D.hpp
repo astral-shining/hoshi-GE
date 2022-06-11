@@ -10,13 +10,12 @@ class Transform2D {
 public:
     inline static InstancedVertexBuffer<glm::vec2> buffer;
 
-    static void staticInit() {
-        buffer.create();
+    Transform2D() {
+        position_ve.create();
     }
 
-    void init(auto& e) {
-        position_ve.create();
-        //a.push_back(10);
+    static void staticInit() {
+        buffer.create();
     }
 
     [[nodiscard]] glm::vec2& getPos() const {
@@ -27,21 +26,17 @@ public:
         position_ve.setValue(v);
     }
 
-    void destroy(auto& e) {
-        position_ve.destroy();
-    }
-
     static void staticUpdate() {
         //buffer.update();
     }
 
     
 
-    Transform2D() {
+    void update([[maybe_unused]] auto& e) {
         
     }
 
-    void update([[maybe_unused]] auto& e) {
-        
+    ~Transform2D() {
+        position_ve.destroy();
     }
 };

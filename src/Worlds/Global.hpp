@@ -3,6 +3,6 @@
 #include "../Entities/Dog.hpp"
 
 struct Global : World<Cat, Dog> {
-    void init(void);
+    Global(void);
     void update(void);
 };

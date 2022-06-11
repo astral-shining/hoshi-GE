@@ -14,7 +14,6 @@ template<typename... Ets>
 class World : public WorldBase {
     EntityPool<Ets...> entity_pool {};
     
-    virtual void init() {}
     virtual void update() {}
     virtual void destroy() {}
 
@@ -22,7 +21,6 @@ public:
 
     Camera camera;
     World() {
-        init();
         camera.init();
     }
 

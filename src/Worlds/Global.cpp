@@ -1,6 +1,6 @@
 #include "Global.hpp"
 
-void Global::init() {
+Global::Global() {
     auto id = createEntity<Cat>();
     createEntity<Dog>();
 
