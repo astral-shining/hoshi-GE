@@ -1,5 +1,7 @@
+#pragma once
 #include <iostream>
 #include <cstdint>
+#include <string.h>
 
 template<typename T, bool swap_remove = false>
 class SmartVector {
@@ -35,7 +37,9 @@ public:
         iterator& operator++() { m_ptr++; return *this; }
         iterator operator++(int) { iterator tmp = *this; ++(*this); return tmp; }
         iterator& operator--() { m_ptr--; return *this; }
+        iterator operator--(int) { iterator tmp = *this; --(*this); return tmp; }
         [[nodiscard]] iterator operator+(int x) const { return m_ptr+x; }
+        [[nodiscard]] iterator operator-(int x) const { return m_ptr-x; }
         friend bool operator== (const iterator& a, const iterator& b) { return a.m_ptr == b.m_ptr; };
         friend bool operator!= (const iterator& a, const iterator& b) { return a.m_ptr != b.m_ptr; };
 
@@ -47,13 +51,16 @@ public:
 
     SmartVector(std::initializer_list<T> l) {
         capacity_ = l.size();
-        min_capacity_ = l.size();
+        capacity_ = capacity_ < 16 ? 16 : capacity_;
+        min_capacity_ = capacity_;
         realloc();
         for (auto& e : l) {
             push_back(e);
         }
     }
     SmartVector() {
+        capacity_ = 16;
+        min_capacity_ = 16;
         realloc();
     }
 
@@ -116,8 +123,11 @@ public:
         memcpy(data_+size_++, &value, sizeof(T));
     }
 
+    template<bool call_destr = true>
     void pop_back() {
-        (*this)[size_--].~T();
+        if constexpr (call_destr) {
+            (*this)[size_--].~T();
+        }
         if (uint32_t c = (capacity_/4); capacity_ > min_capacity_ && size_ == c) {
             shrink();
         }
@@ -128,21 +138,21 @@ public:
         if (size_ == capacity_) {
             grow();
         }
-        return *std::construct_at(data_+size_++, std::forward<Ts>(args)...);
+        return *(new (data_+size_++) T (std::forward<Ts>(args)...));
     }
 
     void erase(iterator it) {
-        if (it >= this->end() || it < this->begin()) {
-            std::cerr << "Invalid vector erase iterator\n";
-            std::abort();
-        }
         it->~T();
         if constexpr (swap_remove) {
-            memcpy(it, --this->end(), sizeof(T));
-            pop_back();
+            *it = *(--this->end());
+            //memcpy(it, --this->end(), sizeof(T));
+            pop_back<false>();
         } else {
-            memmove(it, it+1, sizeof(T)*(--this->end()-it));
+            for (;it!=this->end()-1; it++) {
+                *it = *(it+1);
+            }
             size_--;
+            //memmove(it, it+1, sizeof(T)*(--this->end()-it));
         }
 
     }
@@ -161,5 +171,3 @@ public:
         free(data_);
     }
 };
-
-

@@ -1,3 +1,5 @@
+#pragma once
+#include <cstdint>
 
 template<typename T>
 struct RelativePtr {
@@ -14,7 +16,7 @@ struct RelativePtr {
     }
 
     operator T* () {
-        return (T*) (this->operator->());
+        return this->operator->();
     }
 
     void operator=(T* ptr) {

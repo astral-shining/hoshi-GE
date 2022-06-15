@@ -1,9 +1,17 @@
 #include "Shader.hpp"
 #include <GL/glew.h>
 
-Shader::Shader(const char* vSource_, const char* fSource_) : vSource(vSource_), fSource(fSource_) {}
 
-Shader& Shader::compile() {
+void Shader::compileAll() {
+    for (auto& p : Shader::list) {
+        p->compile();
+    }
+}
+
+Shader::Shader(const char* vSource_, const char* fSource_) : vSource(vSource_), fSource(fSource_) {
+}
+
+void Shader::compile() {
     vs = glCreateShader(GL_VERTEX_SHADER);
     fs = glCreateShader(GL_FRAGMENT_SHADER);
     program = glCreateProgram();
@@ -32,10 +40,6 @@ Shader& Shader::compile() {
     glAttachShader(program, fs);
     glLinkProgram(program);
 
-    compiled = true;
-    compiled_shader_index = compiled_shaders.size();
-    compiled_shaders.push_back(this);
-    return *this;
 }
 
 void Shader::use() {
@@ -54,9 +58,6 @@ void Shader::destroy() {
     glDeleteShader(vs);
     glDeleteShader(fs);
     glDeleteProgram(program);
-
-    compiled_shaders[compiled_shader_index] = compiled_shaders[compiled_shaders.size()-1];
-    compiled_shaders.pop_back();
 }
 
 Shader::~Shader() {

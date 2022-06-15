@@ -2,14 +2,15 @@
 #include <vector>
 #include "Utility.hpp"
 #include "SmartVector.hpp"
+#include "Game.hpp"
 
 template<typename>
 struct EntityManager;
 
 template<typename... Ts>
-struct EntityPool {
+struct EntityManager {
     using ComponentsUsed = norepeated_tuple_t<join_tuple_t<typename Ts::Components...>>;
-    std::tuple<EntityManager<Ts>...> pool {};
+    std::tuple<SmartVector<Ts, false>...> pool {};
     template<auto i>
     auto& get() {
         return std::get<i>(pool);
@@ -71,7 +72,7 @@ struct EntityPool {
 
 template<typename T>
 struct EntityManager {
-    SmartVector<T, true> entities;
+    
     EntityManager() {
         entities.reserve(1024);
     }
@@ -79,7 +80,6 @@ struct EntityManager {
     template<typename... Ts>
     auto& createEntity(Ts&&... args) {
         auto& e = entities.emplace_back(std::forward<Ts>(args)...);
-        //e.id = entities.size()-1;
         e.initComponents();
         return e;
     }
@@ -118,9 +118,14 @@ struct EntityManager {
 
 template<typename... Cmps>
 struct Entity {
-    uint32_t id;
+    uint64_t id {game.world->entity_counter++};
     using Components = std::tuple<Cmps...>;
-    Components components;
+    Components components {
+        ((Cmps*)0, this)...
+    };
+
+    Entity() {
+    }
 
     void foreachComponents(const auto& fn) {
         constexpr_for(auto i=0, i<sizeof...(Cmps), i+1, 
@@ -138,7 +143,6 @@ struct Entity {
         foreachComponents([&] (auto& c) {
             evalif_validexpr(c.destroy(*this));
         });
-        
     }
 
     void updateComponents() {
@@ -161,4 +165,9 @@ struct Entity {
 
     void update() {}
     void destroy() {}
+
+
+    ~Entity() {
+        std::cout << "~Entity\n";
+    }
 };

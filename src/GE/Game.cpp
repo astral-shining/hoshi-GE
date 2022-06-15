@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "Render/Shader.hpp"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -39,4 +40,6 @@ void Game::init() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);  
+
+    Shader::compileAll();
 }

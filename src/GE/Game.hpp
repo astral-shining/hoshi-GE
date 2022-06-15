@@ -2,16 +2,16 @@
 #include <memory>
 
 #include "Window.hpp"
-#include "World.hpp"
+#include "WorldBase.hpp"
 
 class Game {
-    std::unique_ptr<WorldBase> world;
-    Window window {"hakugame"};
     uint32_t fps {};
 
     void loop(void); 
     void init(void);
 public:
+    std::unique_ptr<WorldBase> world;
+    Window window {"hakugame"};
 
     Game() { init(); }
 

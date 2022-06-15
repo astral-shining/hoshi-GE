@@ -337,5 +337,14 @@ void pretty(auto&&) {
     std::cout << name << ": " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n"; \
     }
 
+void printMem(auto t) {
+    using T = decltype(t);
+    constexpr std::size_t s = sizeof(T);
+    T* main_ptr = &t;
 
-
+    const uint8_t* uptr = reinterpret_cast<const uint8_t*>(main_ptr);
+    for (const uint8_t* i=uptr; i<uptr+s; i++) {
+        std::printf("%02X ", *i);
+    }
+    std::printf("\n");
+}

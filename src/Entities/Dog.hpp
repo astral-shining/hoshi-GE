@@ -4,8 +4,11 @@
 
 struct Dog : Entity<Transform2D, Form2D<Triangle>> {
     void update() {
-        auto& c = getComponent<Transform2D>();
+        /*auto& c = getComponent<Transform2D>();
         auto& pos = c.getPos();
-        c.setPos({pos.x-0.001f, pos.y});
+        std::cout << glm::to_string(pos) << std::endl;*/
+        /*
+        
+        c.setPos({pos.x-0.001f, pos.y});*/
     }
 };

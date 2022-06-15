@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Transform2D.hpp"
+#include "../RelativePtr.hpp"
 
 enum Form {
     Triangle
@@ -15,9 +16,11 @@ struct Form2D {
     inline static uint32_t vertexVBO;
     inline static uint32_t instanceVBO;
 
+    RelativePtr<Transform2D> transform;
     std::vector<glm::vec2>::iterator pos_it;
 
-    Form2D() {
+    
+    Form2D(auto p) : transform(&p->template getComponent<Transform2D>()) {
         /*auto& pos = e.template getComponent<Transform2D>().position;
         instances.push_back(pos);
         pos_it = instances.end()-1;*/
@@ -27,8 +30,7 @@ struct Form2D {
     static void staticUpdate(void);
     static void staticDelete(void);
 
-    void init(auto&) {}
-    void update([[maybe_unused]] auto& e) {
+    void update() {
         /*auto& transform = e.template getComponent<Transform2D>();
         if (transform.changed) {
             *pos_it = transform.position;

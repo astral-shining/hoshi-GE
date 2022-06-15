@@ -1,11 +1,11 @@
 #pragma once
 #include <string_view>
-#include <vector>
+#include <SmartVector.hpp>
 
 #include "Utility.hpp"
 
-class Shader { 
-    inline static std::vector<Shader*> compiled_shaders;
+class Shader {
+    inline static SmartVector<Shader*, true> list {};
     uint32_t compiled_shader_index;
     uint32_t vs;
     uint32_t fs;
@@ -16,7 +16,8 @@ class Shader {
 public:
     Shader(const char* vSource_, const char* fSource_);
 
-    Shader& compile(void);
+    static void compileAll(void);
+    void compile(void);
     void use(void);
     uint32_t getProgram(void) const;
     int getAttrib(const char* name) const;
