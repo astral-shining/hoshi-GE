@@ -2,32 +2,37 @@
 #include <vector>
 #include "Utility.hpp"
 #include "SmartVector.hpp"
-#include "Game.hpp"
-
-template<typename>
-struct EntityManager;
 
 template<typename... Ts>
 struct EntityManager {
     using ComponentsUsed = norepeated_tuple_t<join_tuple_t<typename Ts::Components...>>;
-    std::tuple<SmartVector<Ts, false>...> pool {};
+    std::tuple<SmartVector<Ts, true>...> pool {};
+    EntityManager() {
+        foreachVector([] (auto& vec) {
+            vec.reserve(1024);
+        });
+    }
+
     template<auto i>
     auto& get() {
         return std::get<i>(pool);
     }
+
     template<typename T>
     auto& get() {
-        return std::get<EntityManager<T>>(pool);
+        return std::get<SmartVector<T, true>>(pool);
     }
 
-    void init() {
-
+    void foreachVector(const auto& fn) {
+        (fn(std::get<SmartVector<Ts, true>>(pool)), ...);
     }
 
-    void foreachEntityManager(const auto& fn) {
-        constexpr_for(auto i=0, i<sizeof...(Ts), i+1, 
-            fn(get<i>());
-        );
+    void foreachEntity(const auto& fn) {
+        foreachVector([&fn] (auto& vec) {
+            for (auto& el : vec) {
+                fn(el);
+            }
+        });
     }
 
     void staticForeachComponents(const auto& fn) {
@@ -35,6 +40,13 @@ struct EntityManager {
             using T = std::tuple_element_t<i AND ComponentsUsed>;
             fn.template operator()<T>();
         );
+    }
+
+    // create
+    template<typename T, typename... Args>
+    uint64_t createEntity(Args&&... args) {
+        auto& e = get<T>().emplace_back(std::forward<Args>(args)...);
+        return e.id;
     }
 
     // init 
@@ -46,8 +58,9 @@ struct EntityManager {
 
     // update
     void update() {
-        foreachEntityManager([] (auto& em) {
-            em.update();
+        foreachEntity([] (auto& e) {
+            e.update();
+            e.updateComponents();
         });
         staticUpdateComponents();
     }
@@ -59,66 +72,47 @@ struct EntityManager {
     }
 
     // destroy
-    ~EntityPool() {
-        staticDestroyComponents();
-    }
-
     void staticDestroyComponents() {
         staticForeachComponents([] <typename T> () {
             evalif_validexpr(T::staticDestroy());
         });
     }
-};
 
-template<typename T>
-struct EntityManager {
-    
-    EntityManager() {
-        entities.reserve(1024);
-    }
-
-    template<typename... Ts>
-    auto& createEntity(Ts&&... args) {
-        auto& e = entities.emplace_back(std::forward<Ts>(args)...);
-        e.initComponents();
-        return e;
-    }
-
+    template<typename T>
     void destroyEntity(uint32_t id) {
-        for (auto it=entities.begin(); it != entities.end(); ++it) {
+        auto& vec = get<T>();
+        for (auto it=vec.begin(); it != vec.end(); ++it) {
             if (it->id == id) {
                 it->destroy();
                 it->destroyComponents();
-                entities.erase(it);
+                vec.erase(it);
                 break;
             }
         }
     }
 
-    void update() {
-        for (auto& e : entities) {
-            e.updateComponents();
-            e.update();
-        }
+    void clear() {
+        foreachVector([] (auto& vec) {
+            vec.clear();
+        });
     }
 
+    template<typename T>
     void clear() {
-        for (auto& e : entities) {
-            e.destroyComponents();
-            e.destroy();
-        }
-        entities.clear();
+        get<T>().clear();
     }
 
     ~EntityManager() {
-        clear();
+        staticDestroyComponents();
     }
 
+    
 };
+static uint32_t entity_counter {};
 
 template<typename... Cmps>
 struct Entity {
-    uint64_t id {game.world->entity_counter++};
+    uint64_t id {entity_counter++};
     using Components = std::tuple<Cmps...>;
     Components components {
         ((Cmps*)0, this)...
@@ -133,12 +127,6 @@ struct Entity {
         );
     }
     
-    void initComponents() {
-        foreachComponents([&] (auto& c) {
-            evalif_validexpr(c.init(*this));
-        });
-    }
-
     void destroyComponents() {
         foreachComponents([&] (auto& c) {
             evalif_validexpr(c.destroy(*this));

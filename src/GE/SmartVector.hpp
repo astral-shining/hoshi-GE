@@ -98,6 +98,8 @@ public:
 
     void realloc() {
         data_ = (T*)::realloc(data_, sizeof(T)*capacity_);
+        //std::cout << size() << std::endl;
+        //(std::cout << (void*) data_ << std::endl;
     }
 
     void reserve(uint32_t n) {
@@ -126,8 +128,9 @@ public:
     template<bool call_destr = true>
     void pop_back() {
         if constexpr (call_destr) {
-            (*this)[size_--].~T();
-        }
+            (*this)[size_].~T();
+        } 
+        size_--;
         if (uint32_t c = (capacity_/4); capacity_ > min_capacity_ && size_ == c) {
             shrink();
         }
@@ -144,17 +147,15 @@ public:
     void erase(iterator it) {
         it->~T();
         if constexpr (swap_remove) {
-            *it = *(--this->end());
-            //memcpy(it, --this->end(), sizeof(T));
-            pop_back<false>();
+            //*it = *(--this->end());
+            memcpy(it, --this->end(), sizeof(T));
         } else {
-            for (;it!=this->end()-1; it++) {
+            /*for (;it!=this->end()-1; it++) {
                 *it = *(it+1);
-            }
-            size_--;
-            //memmove(it, it+1, sizeof(T)*(--this->end()-it));
+            }*/
+            memmove(it, it+1, sizeof(T)*(--this->end()-it));
         }
-
+        pop_back<false>();
     }
 
     void clear() {

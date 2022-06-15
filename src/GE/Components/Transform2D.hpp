@@ -5,12 +5,10 @@
 #include "RelativePtr.hpp"
 #include "../Render/InstancedVertexBuffer.hpp"
 
-
-
 class Transform2D {
     VertexElement<glm::vec2> position_ve { buffer };
 public:
-    inline static InstancedVertexBuffer<glm::vec2> buffer;
+    static InstancedVertexBuffer<glm::vec2> buffer;
 
     Transform2D(auto p) {
     }
@@ -24,7 +22,7 @@ public:
     }
 
     static void staticUpdate() {
-        //buffer.update();
+        buffer.update();
     }
 
     void update([[maybe_unused]] auto& e) {
@@ -34,3 +32,4 @@ public:
     ~Transform2D() {
     }
 };
+

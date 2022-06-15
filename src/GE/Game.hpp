@@ -2,7 +2,7 @@
 #include <memory>
 
 #include "Window.hpp"
-#include "WorldBase.hpp"
+#include "World.hpp"
 
 class Game {
     uint32_t fps {};

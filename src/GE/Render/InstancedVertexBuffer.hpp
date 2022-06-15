@@ -15,14 +15,19 @@ class InstancedVertexBuffer {
 public:
     using type = T;
     SmartVector<T, true> data;
-    VertexElement<T>* last_element {};
 
     InstancedVertexBuffer() {
+        glGenBuffers(1, &VBO);
+        data.reserve(1024);
+    }
+
+    ~InstancedVertexBuffer() {
+        glDeleteBuffers(1, &VBO);
+        unbind();
     }
 
     void create() {
-        glGenBuffers(1, &VBO);
-        data.reserve(1000);
+        
     }
 
     void update() {
@@ -44,53 +49,23 @@ public:
     void unbind() {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-
-    void del() {
-        glDeleteBuffers(1, &VBO);
-        unbind();
-    }
 };
 
 template<typename T>
 struct VertexElement {
     InstancedVertexBuffer<T>* buffer;
-    VertexElement* next {};
-    VertexElement* back {};
     uint32_t index;
 
     VertexElement(InstancedVertexBuffer<T>& buffer_) : buffer(&buffer_) {
         index = buffer->data.size();
         buffer->data.emplace_back();
-
-        if (buffer->last_element) {
-            buffer->last_element->next = this;
-        } else {
-            buffer->last_element = this;
-        }
-        
-        back = buffer->last_element;
-
-        buffer->last_element = this;
-
-        std::cout << "[VertexElement " << this << "]\n";
-        std::cout << "index: " << index << "\n";
-    }
-    VertexElement& operator=(const VertexElement& e) {
-        index = e.index;
-        if (e.next) {
-            e.next->back = this;
-        }
-        if (e.back) {
-            e.back->next = this;
-        }
-        
-        return *this;
     }
 
     ~VertexElement() {
-        std::cout << "[~VertexElement " << this << "]\n";
-        std::cout << "index: " << index << "\n";
-        buffer->data.erase(buffer->data.begin()+index);
+        if (index < buffer->data.size()) { // safe remove
+            buffer->data.erase(buffer->data.begin()+index);
+        }
+        
         //buffer->last_element->back->next = nullptr;
         //buffer->last_element = buffer->last_element->back;
     }
@@ -104,10 +79,7 @@ struct VertexElement {
         buffer->updateIndex(index);
     }*/
 
-    void create() {
-        
         //it_value = buffer->data.end()-1;
-    }
     /*VertexElement& operator=(const VertexElement& e) {
         return *this;
     }*/

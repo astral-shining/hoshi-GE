@@ -4,17 +4,20 @@
 #include "Entity.hpp"
 #include "Utility.hpp"
 #include "Camera.hpp"
-#include "WorldBase.hpp"
+
+struct WorldBase {
+    uint64_t entity_counter {};
+    virtual void updateWorld() = 0;
+    virtual ~WorldBase() = default;
+};
 
 template<typename... Ets>
 class World : public WorldBase {
-    EntityPool<Ets...> entity_manager {};
-    
     virtual void update() {}
     virtual void destroy() {}
 
 public:
-
+    EntityManager<Ets...> em {};
     Camera camera;
     World() {
         camera.init();
@@ -22,7 +25,7 @@ public:
 
     // UPDATE
     void updateWorld() {
-        entity_pool.update();
+        em.update(); // Update all entities
         update();
     }
 

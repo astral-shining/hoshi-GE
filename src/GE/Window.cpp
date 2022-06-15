@@ -26,6 +26,10 @@ void Window::setSize(int w, int h) {
     size = {w, h};
 }
 
+void Window::setPos(int x, int y) {
+    glfwSetWindowPos(window, x, y);
+}
+
 void Window::onResize(int w, int h) {
     size = {w, h};
     glViewport(0, 0, w, h); // Update opengl width height
