@@ -14,11 +14,11 @@ public:
     }
 
     [[nodiscard]] glm::vec2& getPos() const {
-        //return position_ve.getValue();
+        return position_ve.getValue();
     }
 
     void setPos(const glm::vec2& v) {
-        //position_ve.setValue(v);
+        position_ve.setValue(v);
     }
 
     static void staticUpdate() {

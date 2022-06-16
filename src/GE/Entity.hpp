@@ -11,6 +11,7 @@ struct EntityManager {
         foreachVector([] (auto& vec) {
             vec.reserve(1024);
         });
+        staticInitComponents();
     }
 
     template<auto i>

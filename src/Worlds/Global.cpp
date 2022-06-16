@@ -1,9 +1,7 @@
 #include "Global.hpp"
 
 Global::Global() {
-    auto id = em.createEntity<Cat>();
-    em.createEntity<Dog>();
-    em.destroyEntity<Cat>(id);
+    //auto id = em.createEntity<Cat>();
 }
 
 void Global::update() {

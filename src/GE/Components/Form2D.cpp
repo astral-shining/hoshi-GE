@@ -67,6 +67,7 @@ template<Form f>
 void Form2D<f>::staticUpdate() {
     triangle_shader.use();
     glBindVertexArray(VAO);
+    Transform2D::buffer.bind();
     //glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     //glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * instances.size(), instances.data(), GL_DYNAMIC_DRAW); // instances
 

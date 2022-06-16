@@ -70,14 +70,14 @@ struct VertexElement {
         //buffer->last_element = buffer->last_element->back;
     }
 
-    /*[[nodiscard]] T& getValue() const {
+    [[nodiscard]] T& getValue() const {
         return buffer->data[index];
     }
 
     void setValue(const T& v) {
         buffer->data[index] = v;
         buffer->updateIndex(index);
-    }*/
+    }
 
         //it_value = buffer->data.end()-1;
     /*VertexElement& operator=(const VertexElement& e) {

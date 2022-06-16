@@ -1,19 +1,24 @@
-#include "Game.hpp"
-#include "Render/Shader.hpp"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-Game game;
+#include "Game.hpp"
+#include "Render/Shader.hpp"
 
-void Game::loop() {
+
+auto window = std::make_unique<Window>("hakugame");
+auto input = std::make_unique<Input>();
+UPtr<WorldBase> world;
+
+void G_loop() {
+    static uint32_t fps {};
     float nextSecond = 1;
-    while (!glfwWindowShouldClose(window.getGlfwWindowPtr())) {
+    while (!glfwWindowShouldClose(window->getGlfwWindowPtr())) {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         world.get()->updateWorld();
 
         /* Swap front and back buffers */
-        glfwSwapBuffers(window.getGlfwWindowPtr());
+        glfwSwapBuffers(window->getGlfwWindowPtr());
 
         /* Poll for and process events */
         glfwPollEvents();
@@ -27,7 +32,7 @@ void Game::loop() {
     }
 }
 
-void Game::init() {
+void G_init() {
     glfwSwapInterval(1);
     GLenum err = glewInit();
     if (GLEW_OK != err) {
@@ -41,5 +46,10 @@ void Game::init() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);  
 
-    Shader::compileAll();
+    //Shader::compileAll();
 }
+
+int G_initialization = [] () {
+    G_init();
+    return 0;
+}();
