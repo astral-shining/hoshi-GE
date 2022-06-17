@@ -296,7 +296,7 @@ consteval bool has_args(auto (*) (args...)) {
     return sizeof...(args) > 0;
 }
 
-template<typename... Ts>
+/*template<typename... Ts>
 constexpr auto pretty_tuple(const std::tuple<Ts...>& t) {
     std::cout << "std::tuple<";
     constexpr_for(std::size_t i = 0, i < sizeof...(Ts), i+1, 
@@ -316,7 +316,7 @@ constexpr auto pretty_tuple(const std::tuple<Ts...>& t) {
         }
     );
     std::cout << ">\n";
-}
+}*/
 
 template<std::size_t e = 1, typename... S> 
 requires std::conjunction_v<std::is_convertible<S, std::string_view>...>
