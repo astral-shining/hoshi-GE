@@ -1,5 +1,6 @@
 #pragma once
 #include <tuple>
+#include <memory>
 
 #include "Entity.hpp"
 #include "Utility.hpp"
@@ -10,6 +11,8 @@ struct WorldBase {
     virtual void updateWorld() = 0;
     virtual ~WorldBase() = default;
 };
+
+inline std::unique_ptr<WorldBase> world;
 
 template<typename... Ets>
 class World : public WorldBase {

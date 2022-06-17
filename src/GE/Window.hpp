@@ -1,6 +1,7 @@
 #pragma once 
 #include <string_view>
 #include <stdint.h>
+#include <memory>
 
 class GLFWwindow;
 
@@ -23,3 +24,5 @@ public:
     void toggleFullScreen();
     ~Window();
 };
+
+inline std::unique_ptr<Window> window = std::make_unique<Window>("hakugame");

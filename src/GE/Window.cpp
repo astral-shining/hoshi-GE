@@ -2,6 +2,8 @@
 #include "Utility.hpp"
 #include <GLFW/glfw3.h>
 
+//auto window = std::make_unique<Window>("hakugame");
+
 Window::Window(const std::string_view title, const uint16_t width, const uint16_t height) {
     if (!glfwInit()) {
         terminate("ERROR: glfwInit() in file ", __FILE__);

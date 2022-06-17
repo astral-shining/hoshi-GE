@@ -22,7 +22,7 @@ public:
     }
 
     static void staticUpdate() {
-        buffer.update();
+        //buffer.update();
     }
 
     void update([[maybe_unused]] auto& e) {

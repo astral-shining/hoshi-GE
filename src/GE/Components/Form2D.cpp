@@ -15,18 +15,18 @@ in vec2 vert;
 in vec2 pos;
 
 void main() {
-    gl_Position = vec4(vert.x + pos.x, vert.y + pos.y, -1.0, 1.0);
+    gl_Position = vec4(vert.x + pos.x, vert.y + pos.y, 0.0, 1.0);
 })",
 R"(#version 300 es
 precision mediump float;
 out vec4 FragColor;
 void main() {
-    FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
+    FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 })"
 };
 
 static constexpr std::initializer_list<float> triangle_vertices {
-    -0.5f, -0.5f,
+    -0.0f, -0.5f,
      0.5f, -0.5f,
      0.0f,  0.5f
 };
@@ -75,7 +75,7 @@ void Form2D<f>::staticUpdate() {
     //glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * instances.size(), instances.data(), GL_DYNAMIC_DRAW);
     //glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec2) * instances.size(), instances.data());
     //std::cout << instances[0].x << std::endl;
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 3, Transform2D::buffer.data.size());
+    glDrawArraysInstanced(GL_LINE_LOOP, 0, 3, Transform2D::buffer.data.size());
 }
 
 template<Form f>

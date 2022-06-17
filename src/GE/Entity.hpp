@@ -1,7 +1,12 @@
 #pragma once
 #include <vector>
+#include <memory>
+
 #include "Utility.hpp"
 #include "SmartVector.hpp"
+
+static uint32_t l_index {};
+static uint32_t l_count {};
 
 template<typename... Ts>
 struct EntityManager {
@@ -36,6 +41,13 @@ struct EntityManager {
         });
     }
 
+    template<typename T>
+    void foreachEntity(const auto& fn) {
+        for (auto& el : get<T>()) {
+            fn(el);
+        }
+    }
+
     void staticForeachComponents(const auto& fn) {
         constexpr_for(auto i=0, i<std::tuple_size_v<ComponentsUsed>, i+1,
             using T = std::tuple_element_t<i AND ComponentsUsed>;
@@ -45,9 +57,9 @@ struct EntityManager {
 
     // create
     template<typename T, typename... Args>
-    uint64_t createEntity(Args&&... args) {
-        auto& e = get<T>().emplace_back(std::forward<Args>(args)...);
-        return e.id;
+    auto& createEntity(Args&&... args) {
+        l_index = get<T>().size();
+        return get<T>().emplace_back(std::forward<Args>(args)...);
     }
 
     // init 
@@ -103,23 +115,55 @@ struct EntityManager {
         get<T>().clear();
     }
 
+
+    // Create reference
+    template<typename T>
+    void ref(T& e) {
+            //EntityRef<T> r = static_cast<EntityRef<T>>(e.reference);
+        
+        //return static_cast<EntityRef<T>>(e.reference);
+        /*
+        if (!r.ptr.get()) {
+            r.ptr = std::make_shared<typename EntityRef<T>::Content>(e.index, &get<T>());
+        }
+        return r;*/
+        /*if (!e.reference.ptr.get()) {
+            e.reference.ptr = std::make_shared<EntityRef<T>>(e.index, get<T>());
+        }
+        return static_cast<std::shared_ptr<EntityRef<T>>>(e.reference.ptr);*/
+    }
+
     ~EntityManager() {
         staticDestroyComponents();
     }
-
-    
 };
-static uint32_t entity_counter {};
 
 template<typename... Cmps>
 struct Entity {
-    uint64_t id {entity_counter++};
+    //SmartVector<Entity, true>* vec { reinterpret_cast<SmartVector<Entity, true>*>(eparams->vec) };
+    uint32_t index { l_index };
     using Components = std::tuple<Cmps...>;
+    uint32_t id { l_count++ };
     Components components {
         ((Cmps*)0, this)...
     };
 
-    Entity() {
+    Entity& operator=(Entity& e) {
+        components = e.components;
+        id = e.id;
+        index = e.index;
+        updateRef();
+        return *this;
+    }
+
+    /*auto& ref() {
+        if (!reference.get()) {
+            reference = std::make_shared<EntityRef<Entity>::Content>(index, vec);
+        }
+        return reference;
+    }*/
+
+    void updateRef() {
     }
 
     void foreachComponents(const auto& fn) {
@@ -157,6 +201,6 @@ struct Entity {
 
 
     ~Entity() {
-        std::cout << "~Entity\n";
+        //updateRef();
     }
 };

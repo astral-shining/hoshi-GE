@@ -97,7 +97,7 @@ public:
     }
 
     void realloc() {
-        data_ = (T*)::realloc(data_, sizeof(T)*capacity_);
+        data_ = (T*)::realloc((void*)data_, sizeof(T)*capacity_);
         //std::cout << size() << std::endl;
         //(std::cout << (void*) data_ << std::endl;
     }
@@ -128,7 +128,7 @@ public:
     template<bool call_destr = true>
     void pop_back() {
         if constexpr (call_destr) {
-            (*this)[size_].~T();
+            (*this)[size_-1].~T();
         } 
         size_--;
         if (uint32_t c = (capacity_/4); capacity_ > min_capacity_ && size_ == c) {
@@ -147,8 +147,8 @@ public:
     void erase(iterator it) {
         it->~T();
         if constexpr (swap_remove) {
-            //*it = *(--this->end());
-            memcpy(it, --this->end(), sizeof(T));
+            *it = *(--this->end());
+            //memcpy(it, --this->end(), sizeof(T));
         } else {
             /*for (;it!=this->end()-1; it++) {
                 *it = *(it+1);
@@ -159,12 +159,9 @@ public:
     }
 
     void clear() {
-        if constexpr (!std::is_trivially_destructible_v<T>) {
-            for (uint32_t i{}; i<size_; i++) {
-                (*this)[i].~T();
-            }
+        for (uint32_t i{size_}; i>0; i--) {
+            this->pop_back();
         }
-        size_ = 0;
     }
 
     ~SmartVector() {

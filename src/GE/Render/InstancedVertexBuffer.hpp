@@ -38,7 +38,7 @@ public:
 
     void updateIndex(uint32_t index) {
         bind();
-        glBufferSubData(GL_ARRAY_BUFFER, index*sizeof(T), sizeof(T), data.data()+index);
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(T)*index, sizeof(T), data.data()+index);
         unbind();
     }
 
@@ -59,12 +59,18 @@ struct VertexElement {
     VertexElement(InstancedVertexBuffer<T>& buffer_) : buffer(&buffer_) {
         index = buffer->data.size();
         buffer->data.emplace_back();
+        buffer->update();
+    }
+
+    VertexElement& operator=(const VertexElement& e) {
+        return *this;
     }
 
     ~VertexElement() {
         if (index < buffer->data.size()) { // safe remove
             buffer->data.erase(buffer->data.begin()+index);
         }
+        //buffer->update();
         
         //buffer->last_element->back->next = nullptr;
         //buffer->last_element = buffer->last_element->back;

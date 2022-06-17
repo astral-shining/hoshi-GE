@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 #define KEY_UNKNOWN -1
 #define KEY_SPACE 32
@@ -126,3 +127,5 @@
 struct Input {
     bool keyIsPressed(int key);
 };
+
+extern std::unique_ptr<Input> input;

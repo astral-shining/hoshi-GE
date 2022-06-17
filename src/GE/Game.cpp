@@ -4,11 +4,6 @@
 #include "Game.hpp"
 #include "Render/Shader.hpp"
 
-
-auto window = std::make_unique<Window>("hakugame");
-auto input = std::make_unique<Input>();
-UPtr<WorldBase> world;
-
 void G_loop() {
     static uint32_t fps {};
     float nextSecond = 1;
