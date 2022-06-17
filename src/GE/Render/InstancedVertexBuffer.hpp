@@ -17,17 +17,19 @@ public:
     SmartVector<T, true> data;
 
     InstancedVertexBuffer() {
-        glGenBuffers(1, &VBO);
+
         data.reserve(1024);
     }
 
     ~InstancedVertexBuffer() {
-        glDeleteBuffers(1, &VBO);
-        unbind();
     }
 
     void create() {
-        
+        glGenBuffers(1, &VBO);
+    }
+
+    void destroy() {
+        glDeleteBuffers(1, &VBO);
     }
 
     void update() {

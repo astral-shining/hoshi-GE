@@ -2,6 +2,7 @@
 #include "Input.hpp"
 
 Global::Global() {
+    cat = &em.createEntity<Cat>(glm::vec2{});
 }
 
 void Global::update() {
@@ -14,10 +15,8 @@ void Global::update() {
     }
     if (input->keyIsPressed(KEY_F5)) {
         em.clear();
-        cat = nullptr;
+        cat = &em.createEntity<Cat>(glm::vec2{});
     }
 
-    if (cat) {
-        cat->move();
-    }
+    cat->move();
 }

@@ -20,6 +20,13 @@ public:
     void setPos(const glm::vec2& v) {
         position_ve.setValue(v);
     }
+    static void staticInit() {
+        buffer.create();
+    }
+
+    static void staticDestroy() {
+        buffer.destroy();
+    }
 
     static void staticUpdate() {
         //buffer.update();

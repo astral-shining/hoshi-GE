@@ -28,7 +28,7 @@ void G_loop() {
 }
 
 void G_init() {
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         terminate("ERROR:", (const char* ) glewGetErrorString(err));
