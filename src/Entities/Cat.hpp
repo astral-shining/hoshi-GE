@@ -11,18 +11,19 @@ struct Cat : Entity<Transform2D, Form2D<Triangle>> {
     void move() {
         auto& c = getComponent<Transform2D>();
         auto& pos = c.getPos();
+        float velocity = delta_time * 15;
 
         if (input->keyIsPressed(KEY_LEFT)) {
-            c.setPos({pos.x-0.01f, pos.y});
+            c.setPos({pos.x-velocity, pos.y});
         } 
         if (input->keyIsPressed(KEY_RIGHT)) {
-            c.setPos({pos.x+0.01f, pos.y});
+            c.setPos({pos.x+velocity, pos.y});
         } 
         if (input->keyIsPressed(KEY_UP)) {
-            c.setPos({pos.x, pos.y+0.01f});
+            c.setPos({pos.x, pos.y+velocity});
         } 
         if (input->keyIsPressed(KEY_DOWN)) {
-            c.setPos({pos.x, pos.y-0.01f});
+            c.setPos({pos.x, pos.y-velocity});
         } 
         
     }

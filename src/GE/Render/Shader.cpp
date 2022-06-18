@@ -40,6 +40,8 @@ void Shader::compile() {
     glAttachShader(program, fs);
     glLinkProgram(program);
 
+    glDeleteShader(vs);
+    glDeleteShader(fs);
 }
 
 void Shader::use() {
@@ -55,8 +57,6 @@ int Shader::getAttrib(const char* name) const {
 }
 
 void Shader::destroy() {
-    glDeleteShader(vs);
-    glDeleteShader(fs);
     glDeleteProgram(program);
 }
 

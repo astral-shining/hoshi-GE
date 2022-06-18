@@ -13,6 +13,7 @@ struct WorldBase {
 };
 
 inline std::unique_ptr<WorldBase> world;
+extern double delta_time;
 
 template<typename... Ets>
 class World : public WorldBase {

@@ -4,11 +4,18 @@
 #include "Game.hpp"
 #include "Render/Shader.hpp"
 
+double delta_time {};
+
 void G_loop() {
-    static uint32_t fps {};
-    float nextSecond = 1;
+    uint32_t fps {};
+    float next_second = 1;
+    double time_last_frame {};
     while (!glfwWindowShouldClose(window->getGlfwWindowPtr())) {
         /* Render here */
+        
+        delta_time = glfwGetTime()-time_last_frame;
+        time_last_frame = glfwGetTime();
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         world.get()->updateWorld();
 
@@ -18,9 +25,10 @@ void G_loop() {
         /* Poll for and process events */
         glfwPollEvents();
 
-        if (double t = glfwGetTime(); t > nextSecond) {
-            std::cout << fps << std::endl;
-            nextSecond = t+1;
+        if (double t = glfwGetTime(); t > next_second) {
+            std::cout << "fps: " << fps << std::endl;
+            std::cout << "deltaTime: " << delta_time << std::endl;
+            next_second = t+1;
             fps = 0;
         }
         fps++;
