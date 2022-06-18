@@ -1,4 +1,4 @@
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "Game.hpp"
@@ -29,12 +29,11 @@ void G_loop() {
 
 void G_init() {
     glfwSwapInterval(0);
-    GLenum err = glewInit();
-    if (GLEW_OK != err) {
-        terminate("ERROR:", (const char* ) glewGetErrorString(err));
+    if (!gladLoadGLES2Loader((GLADloadproc) glfwGetProcAddress)) {
+        terminate("ERROR: Initializing glad");
     } 
 
-    if (!GLEW_VERSION_3_0) {
+    if (!GLAD_GL_ES_VERSION_3_0) {
         terminate("ERROR: Opengl 3.0 not supported");
     }
 

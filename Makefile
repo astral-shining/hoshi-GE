@@ -1,20 +1,20 @@
 TARGET    := test
 
-SRC_DIR   := src
+CC        := g++
 OBJ_DIR   := build
-GCM_DIR   := gcm.cache
+SRC_DIR   := src
 
-GE_MODULE_OBJ := $()
-
-SRC_FILES := $(SRC_DIR)/main.cpp $(shell find $(SRC_DIR) ! -name "main.cpp" -type f -name "*.cpp")
+SRC_FILES := $(SRC_DIR)/main.cpp $(shell find $(SRC_DIR) ! -name "main.cpp" -type f -name "*.cpp") 
 OBJ_FILES := $(patsubst $(SRC_DIR)%.cpp,$(OBJ_DIR)%.o,$(SRC_FILES))
 DEP_FILES := $(patsubst $(SRC_DIR)%.cpp,$(OBJ_DIR)%.d,$(SRC_FILES))
 
-SRC_SUBDIRS := $(shell find $(SRC_DIR) -type d)
-OBJ_SUBDIRS := $(patsubst $(SRC_DIR)%,$(OBJ_DIR)%,$(SRC_SUBDIRS))
+OBJ_FILES += build/glad/glad.o
 
-CPPFLAGS += -Wall -Wextra -pedantic -std=c++20 -I $(SRC_DIR)/GE -Wno-unused -O2 
-LDFLAGS += -lglfw -lGL -lGLEW
+SRC_SUBDIRS := $(shell find $(SRC_DIR) -type d)
+OBJ_SUBDIRS := $(patsubst $(SRC_DIR)%,$(OBJ_DIR)%,$(SRC_SUBDIRS)) build/glad/
+
+CPPFLAGS += -Wall -Wextra -pedantic -std=c++20 -I $(SRC_DIR)/GE -I glad/include -Wno-unused -O2 
+LDFLAGS += -lglfw -lGL 
 
 .PHONY: all clean segf
 
@@ -23,16 +23,19 @@ segf: CPPFLAGS += -Og -g -fsanitize=address
 segf: LDFLAGS += -Og -g -fsanitize=address
 segf: $(TARGET)
 
-$(TARGET): $(SYSTEM_MODULES) $(OBJ_SUBDIRS) $(OBJ_FILES)
-	clang++ -o $@ $(OBJ_FILES) $(LDFLAGS)
+$(TARGET): $(OBJ_SUBDIRS) $(OBJ_FILES)
+	$(CC) -o $@ $(OBJ_FILES) $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	clang++ -MMD -MP $(CPPFLAGS) -c $< -o $@
+	$(CC) -MMD -MP $(CPPFLAGS) -c $< -o $@
+
+build/glad/glad.o: glad/src/glad.c
+	$(CC) -MMD -MP $(CPPFLAGS) -c $< -o $@
 
 $(OBJ_SUBDIRS):
 	mkdir -p $@
 
 clean:
-	rm -rf $(TARGET) $(OBJ_SUBDIRS) $(SYSTEM_MODULES)
+	rm -rf $(TARGET) $(OBJ_SUBDIRS) 
 
 -include $(DEP_FILES)

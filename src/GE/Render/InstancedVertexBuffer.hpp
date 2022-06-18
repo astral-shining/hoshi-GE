@@ -1,6 +1,6 @@
 #include <initializer_list>
 #include <stdint.h>
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <iostream>
 #include "../SmartVector.hpp"
 #include "../Utility.hpp"
@@ -17,7 +17,7 @@ public:
     SmartVector<T, true> data;
 
     InstancedVertexBuffer() {
-
+        //std::cout << __PRETTY_TUPLE__ << std::endl;
         data.reserve(1024);
     }
 

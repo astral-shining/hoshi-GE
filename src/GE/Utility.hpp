@@ -139,6 +139,17 @@ struct slice_tuple<T, start, end, std::tuple<Ts...>> :
 template<typename T, std::size_t start, std::size_t end = std::tuple_size_v<T>>
 using slice_tuple_t = typename slice_tuple<T, start, end-1, std::tuple<>>::type;
 
+// Reverse tuple
+template<typename, typename R = std::tuple<>>
+struct reverse_tuple : std::type_identity<R> {};
+
+template<typename T, typename... Ts1, typename... Ts2>
+struct reverse_tuple<std::tuple<T, Ts1...>, std::tuple<Ts2...>> : reverse_tuple<std::tuple<Ts1...>, std::tuple<T, Ts2...>> {
+};
+
+template<typename T>
+using reverse_tuple_t = typename reverse_tuple<T>::type;
+
 // Conditional constexpr
 #define conditional_constexpr(cond, type1, type2) decltype([] () consteval { \
     if constexpr (cond) { \

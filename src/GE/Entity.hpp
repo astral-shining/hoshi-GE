@@ -144,7 +144,7 @@ struct Entity {
     uint32_t index { l_index };
     using Components = std::tuple<Cmps...>;
     uint32_t id { l_count++ };
-    Components components {
+    reverse_tuple_t<Components> components {
         ((Cmps*)0, this)...
     };
 
@@ -154,6 +154,8 @@ struct Entity {
         index = e.index;
         updateRef();
         return *this;
+    }
+    Entity() {
     }
 
     /*auto& ref() {
@@ -174,13 +176,13 @@ struct Entity {
     
     void destroyComponents() {
         foreachComponents([&] (auto& c) {
-            evalif_validexpr(c.destroy(*this));
+            evalif_validexpr(c.destroy());
         });
     }
 
     void updateComponents() {
         foreachComponents([&] (auto& c) {
-            evalif_validexpr(c.update(*this));
+            evalif_validexpr(c.update());
         });
     }
 

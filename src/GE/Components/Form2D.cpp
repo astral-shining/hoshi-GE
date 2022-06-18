@@ -1,7 +1,7 @@
 #include <initializer_list>
 #include <glm/vec2.hpp>
 #include <vector>
-#include <GL/glew.h>
+#include <glad/glad.h>
 
 #include "Form2D.hpp"
 #include "Transform2D.hpp"
