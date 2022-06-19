@@ -5,25 +5,23 @@
 
 struct Cat : Entity<Transform2D, Form2D<Triangle>> {
     bool disabled {};
-    Cat(glm::vec2 pos) {
-        getComponent<Transform2D>().setPos(pos);
+    Cat() {
+        
     }
     void move() {
         auto& c = getComponent<Transform2D>();
-        auto& pos = c.getPos();
-        float velocity = delta_time * 15;
-
+        float velocity = 10.f * delta_time;
         if (input->keyIsPressed(KEY_LEFT)) {
-            c.setPos({pos.x-velocity, pos.y});
+            c.position.x -= velocity;
         } 
         if (input->keyIsPressed(KEY_RIGHT)) {
-            c.setPos({pos.x+velocity, pos.y});
+            c.position.x += velocity;
         } 
         if (input->keyIsPressed(KEY_UP)) {
-            c.setPos({pos.x, pos.y+velocity});
+            c.position.y += velocity;
         } 
         if (input->keyIsPressed(KEY_DOWN)) {
-            c.setPos({pos.x, pos.y-velocity});
+            c.position.y -= velocity;
         } 
         
     }

@@ -72,6 +72,10 @@ public:
         return iterator(data_ + size_);
     }
 
+    [[nodiscard]] T& back() {
+        return *(--this->end());
+    }
+
     [[nodiscard]] const iterator cbegin() {
         return iterator(data_);
     }
@@ -97,6 +101,7 @@ public:
     }
 
     void realloc() {
+        T* old = data_;
         data_ = (T*)::realloc((void*)data_, sizeof(T)*capacity_);
         //std::cout << size() << std::endl;
         //(std::cout << (void*) data_ << std::endl;

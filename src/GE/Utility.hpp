@@ -3,6 +3,7 @@
 #include <iostream>
 #include <type_traits>
 #include <tuple>
+#include <chrono>
 
 #include "FixedString.hpp"
 
@@ -343,7 +344,7 @@ void pretty(auto&&) {
 }
 
 #define START_BENCH(NAME) { const char* name {NAME}; auto start = std::chrono::steady_clock::now();
-#define END_BENCH \
+#define END_BENCH() \
     auto end = std::chrono::steady_clock::now(); \
     std::cout << name << ": " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n"; \
     }

@@ -7,6 +7,7 @@
 #include "Transform2D.hpp"
 #include "../Render/Shader.hpp"
 #include "Transform2D.hpp"
+#include "../Utility.hpp"
 
 Shader triangle_shader {
 R"(#version 300 es
@@ -33,24 +34,31 @@ static constexpr std::initializer_list<float> triangle_vertices {
 };
 
 template<Form f>
+void Form2D<f>::init() {
+    indexes.push_back(transform_buffer.size());
+    index = --indexes.end();
+    transform_buffer.push_back(transform->position);
+}
+
+template<Form f>
 void Form2D<f>::staticInit() {
     triangle_shader.compile();
 
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &vertexVBO);
-    glGenBuffers(1, &instanceVBO);
+    glGenBuffers(1, &vertex_VBO);
+    glGenBuffers(1, &transform_VBO);
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
-    glBufferData(GL_ARRAY_BUFFER, triangle_vertices.size()*sizeof(float), triangle_vertices.begin(), GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_VBO);
+    glBufferData(GL_ARRAY_BUFFER, triangle_vertices.size()*sizeof(float), triangle_vertices.begin(), GL_STATIC_DRAW);
     GLint vert = triangle_shader.getAttrib("vert");
     glVertexAttribPointer(vert, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(vert);
 
 
-    //glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, transform_VBO);
     //glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 2, example, GL_DYNAMIC_DRAW); // instances
-    Transform2D::buffer.bind();
     GLint pos = triangle_shader.getAttrib("pos");
     glVertexAttribPointer(pos, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(pos);
@@ -64,9 +72,13 @@ void Form2D<f>::staticInit() {
 
 template<Form f>
 void Form2D<f>::staticUpdate() {
+    // Update transform
+    glBindBuffer(GL_ARRAY_BUFFER, transform_VBO);
+    glBufferData(GL_ARRAY_BUFFER, transform_buffer.size()*sizeof(glm::vec2), transform_buffer.data(), GL_DYNAMIC_DRAW);
     triangle_shader.use();
     glBindVertexArray(VAO);
-    Transform2D::buffer.bind();
+    
+    //Transform2D::buffer.bind();
     //glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     //glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * instances.size(), instances.data(), GL_DYNAMIC_DRAW); // instances
 
@@ -74,16 +86,27 @@ void Form2D<f>::staticUpdate() {
     //glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * instances.size(), instances.data(), GL_DYNAMIC_DRAW);
     //glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glm::vec2) * instances.size(), instances.data());
     //std::cout << instances[0].x << std::endl;
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 3, Transform2D::buffer.data.size());
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 3, transform_buffer.size());
 }
 
 template<Form f>
-void Form2D<f>::staticDelete() {
+void Form2D<f>::staticDestroy() {
+}
 
+template<Form f>
+void Form2D<f>::update() {
+    transform_buffer[*index] = transform->position;
 }
 
 template<Form f>
 Form2D<f>::~Form2D() {
+    if (transform_buffer.size() > 0) {
+        transform_buffer.erase(transform_buffer.begin() + *index);
+        *--indexes.end() = *index;
+        indexes.splice(index, indexes, --indexes.end());
+        indexes.erase(index);
+    }
+
     /*Form2D*& last = *(formList.end()-1);
     Form2D*& current = formList[pos_it-positions.begin()];
     std::cout << this << std::endl;*/
