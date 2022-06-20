@@ -2,7 +2,7 @@
 #include <Components/Transform2D.hpp>
 #include <Components/Form2D.hpp>
 
-struct Dog : Entity<Transform2D, Form2D<Triangle>> {
+struct Dog : Entity<Dog, Transform2D, Form2D<Triangle>> {
     void update() {
         /*auto& c = getComponent<Transform2D>();
         auto& pos = c.getPos();

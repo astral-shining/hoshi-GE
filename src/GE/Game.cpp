@@ -27,7 +27,6 @@ void G_loop() {
 
         if (double t = glfwGetTime(); t > next_second) {
             std::cout << "fps: " << fps << std::endl;
-            std::cout << "deltaTime: " << delta_time << std::endl;
             next_second = t+1;
             fps = 0;
         }
@@ -36,7 +35,7 @@ void G_loop() {
 }
 
 void G_init() {
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
     if (!gladLoadGLES2Loader((GLADloadproc) glfwGetProcAddress)) {
         terminate("ERROR: Initializing glad");
     } 

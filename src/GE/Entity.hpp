@@ -5,13 +5,48 @@
 #include "Utility.hpp"
 #include "SmartVector.hpp"
 
-static uint32_t l_index {};
+
+template<typename T>
+struct EntityRef {
+    struct IndexRef {
+        SmartVector<T, true>* vec;
+        uint32_t index;
+        bool removed;
+    };
+
+    std::shared_ptr<IndexRef> index_ref;
+
+    EntityRef& operator=(T& e) {
+        index_ref = e.createRef();
+        return *this;
+    }
+
+    bool exists() {
+        if (index_ref.get()) {
+            return !index_ref->removed;
+        } else {
+            return false;
+        }
+
+    }
+
+    T& get() {
+        return (*index_ref->vec)[index_ref->index];
+    }
+
+    T* operator->() {
+        return &get();
+    }
+};
+
+
 static uint32_t l_count {};
+static void* l_vec {};
 
 template<typename... Ts>
 struct EntityManager {
     using ComponentsUsed = norepeated_tuple_t<join_tuple_t<typename Ts::Components...>>;
-    std::tuple<SmartVector<Ts, true>...> pool {};
+    inline static std::tuple<SmartVector<Ts, true>...> pool {};
     EntityManager() {
         foreachVector([] (auto& vec) {
             vec.reserve(1024);
@@ -58,7 +93,7 @@ struct EntityManager {
     // create
     template<typename T, typename... Args>
     auto& createEntity(Args&&... args) {
-        l_index = get<T>().size();
+        l_vec = &get<T>();
         return get<T>().emplace_back(std::forward<Args>(args)...);
     }
 
@@ -138,23 +173,25 @@ struct EntityManager {
     }
 };
 
-template<typename... Cmps>
+template<typename E, typename... Cmps>
 struct Entity {
-    //SmartVector<Entity, true>* vec { reinterpret_cast<SmartVector<Entity, true>*>(eparams->vec) };
-    uint32_t index { l_index };
+    SmartVector<E, true>* vec { reinterpret_cast<SmartVector<E, true>*>(l_vec) };
+    uint32_t index { vec->size()-1 };
     using Components = std::tuple<Cmps...>;
     uint32_t id { l_count++ };
     reverse_tuple_t<Components> components {
         ((Cmps*)0, this)...
     };
+    std::shared_ptr<typename EntityRef<E>::IndexRef> index_ref;
 
     Entity& operator=(Entity& e) {
         components = e.components;
+        index_ref = e.index_ref;
         id = e.id;
-        index = e.index;
         updateRef();
         return *this;
     }
+
     Entity() {
     }
 
@@ -165,7 +202,23 @@ struct Entity {
         return reference;
     }*/
 
+    auto createRef() {
+        if (!index_ref.get()) {
+            index_ref = std::make_shared<typename EntityRef<E>::IndexRef>(vec, index, false);
+        }
+        return index_ref;
+    }
+
     void updateRef() {
+        if (index_ref.get()) {
+            index_ref->index = index;
+        }
+    }
+
+    void removeRef() {
+        if (index_ref.get()) {
+            index_ref->removed = true;
+        }
     }
 
     void foreachComponents(const auto& fn) {
@@ -203,6 +256,7 @@ struct Entity {
 
 
     ~Entity() {
+        removeRef();
         //updateRef();
     }
 };

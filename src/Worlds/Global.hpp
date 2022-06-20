@@ -3,7 +3,8 @@
 #include "../Entities/Dog.hpp"
 
 struct Global : World<Cat, Dog> {
-    Cat* cat {};
+    EntityRef<Cat> current_cat;
+    EntityRef<Cat> example;
     Global(void);
     void update(void);
 };

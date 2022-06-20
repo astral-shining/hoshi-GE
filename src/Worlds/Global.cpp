@@ -2,24 +2,24 @@
 #include "Input.hpp"
 
 Global::Global() {
-    cat = &em.createEntity<Cat>();
+    current_cat = em.createEntity<Cat>();
 }
 
 void Global::update() {
-    if (input->keyIsPressed(KEY_SPACE)) {
-        glm::vec p = cat->getComponent<Transform2D>().position;
-        cat = &em.createEntity<Cat>();
-        cat->getComponent<Transform2D>().position = p;
+    auto& vec = em.get<Cat>();
+    if (input->keyIsPressed(KEY_C)) {
+        glm::vec p = current_cat->getComponent<Transform2D>().position;
+        em.createEntity<Cat>().getComponent<Transform2D>().position = p;
     }
-    if (input->keyIsPressed(KEY_F5)) {
-        auto& l = em.get<Cat>();
-        if (l.size() > 1) {
-            l.erase(l.begin());
-        } 
-        cat = l.begin()+l.size()-1;
+    if (input->keyIsPressed(KEY_X)) {
+        example = vec.back();
     }
-    if (cat) {
-        cat->move();
+    if (input->keyIsPressed(KEY_Z)) {
+        if (vec.size() > 1) {
+            vec.pop_back();
+        }
     }
-        
+    if (current_cat.exists()) {
+        current_cat->move();
+    }
 }
