@@ -125,7 +125,9 @@
 #define KEY_LAST KEY_MENU
 
 struct Input {
-    bool keyIsPressed(int key);
+    Input();
+    bool getKey(int key);
+    bool getKeyDown(int key);
 };
 
 extern std::unique_ptr<Input> input;

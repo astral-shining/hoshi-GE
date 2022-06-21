@@ -21,6 +21,7 @@ class World : public WorldBase {
     virtual void destroy() {}
 
 public:
+    using Entities = std::tuple<Ets...>;
     EntityManager<Ets...> em {};
     Camera camera;
     World() {

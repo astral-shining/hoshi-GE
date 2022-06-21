@@ -35,7 +35,7 @@ void G_loop() {
 }
 
 void G_init() {
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
     if (!gladLoadGLES2Loader((GLADloadproc) glfwGetProcAddress)) {
         terminate("ERROR: Initializing glad");
     } 

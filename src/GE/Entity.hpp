@@ -8,6 +8,7 @@
 
 template<typename T>
 struct EntityRef {
+    using type = T;
     struct IndexRef {
         SmartVector<T, true>* vec;
         uint32_t index;
@@ -15,6 +16,14 @@ struct EntityRef {
     };
 
     std::shared_ptr<IndexRef> index_ref;
+
+    EntityRef() {
+
+    }
+
+    EntityRef(T& e) {
+        index_ref = e.createRef();
+    }
 
     EntityRef& operator=(T& e) {
         index_ref = e.createRef();
@@ -227,12 +236,6 @@ struct Entity {
         );
     }
     
-    void destroyComponents() {
-        foreachComponents([&] (auto& c) {
-            evalif_validexpr(c.destroy());
-        });
-    }
-
     void updateComponents() {
         foreachComponents([&] (auto& c) {
             evalif_validexpr(c.update());
@@ -244,6 +247,10 @@ struct Entity {
         return std::get<T>(components);
     }
 
+    void destroy() {
+        vec->erase(vec->begin()+index);
+    }
+
     /*inline static std::vector<T> entities;
 
     template<typename... Ts>
@@ -252,7 +259,6 @@ struct Entity {
     }*/
 
     void update() {}
-    void destroy() {}
 
 
     ~Entity() {

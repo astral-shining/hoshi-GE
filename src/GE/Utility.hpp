@@ -28,19 +28,32 @@ IS_FROM_TEMPLATE(fsts, FixedString Fs AND typename... Ts, Fs AND Ts...);
 IS_FROM_TEMPLATE(fsvs, FixedString Fs AND auto... Vs, Fs AND Vs...);
 
 
-// Convert tuple types to 
-template<template<typename...> typename C, typename... T>
-struct tuple_to {};
+// Convert any template to 
+template<typename, template<typename...> typename>
+struct template_to {};
 
-template<template<typename...> typename C, typename... T>
-struct tuple_to<C, std::tuple<T...>> {
-    using type = C<T...>;
-};
+template<template<typename...> typename Tm1, template<typename...> typename Tm2, typename... T>
+struct template_to<Tm1<T...>, Tm2> : std::type_identity<Tm2<T...>> {};
 
-template<template<typename...> typename C, typename T>
-using tuple_to_t = typename tuple_to<C, T>::type;
+template<typename T, template<typename...> typename Tm>
+using template_to_t = typename template_to<T, Tm>::type;
 
 
+// Find type in a tuple
+template<typename, typename, std::size_t = 0>
+struct find_tuple {};
+
+template<typename T, typename iType, typename... Ts, std::size_t i>
+struct find_tuple<T, std::tuple<iType, Ts...>, i> : 
+    std::conditional_t<std::is_same_v<iType, T>, 
+            std::integral_constant<std::size_t, i>, 
+            find_tuple<T, std::tuple<Ts...>, i+1>
+    > {};
+
+template<typename T, typename Tuple>
+inline constexpr std::size_t find_tuple_v = find_tuple<T, Tuple>::value;
+
+// Remove type from tuple
 template<typename Tdel, typename T1, typename T2 = std::tuple<>>
 struct remove_T_tuple : std::type_identity<void> {};
 
@@ -215,7 +228,7 @@ struct filter_tuple_##NAME<std::tuple<T, Ts...>, std::tuple<TsF...>> :          
 template<typename T>                                                                \
 using filter_tuple_##NAME##_t = typename filter_tuple_##NAME<T, std::tuple<>>::type;
 
-constexpr auto find_tuple(auto&& t, const auto& filter_fn, const auto& fn) {
+/*constexpr auto find_tuple(auto&& t, const auto& filter_fn, const auto& fn) {
     constexpr std::size_t tupl_size = std::tuple_size_v<std::remove_reference_t<decltype(t)>>;
     auto f = [&] <auto i=0, std::size_t... s> (const auto& fref) constexpr {
         if constexpr (i < tupl_size) {
@@ -231,9 +244,9 @@ constexpr auto find_tuple(auto&& t, const auto& filter_fn, const auto& fn) {
     };
 
     return f(f);
-}
+}*/
 
-constexpr auto find1_tuple(auto&& t, const auto& filter_fn, const auto& fn) {
+/*constexpr auto find1_tuple(auto&& t, const auto& filter_fn, const auto& fn) {
     constexpr std::size_t tupl_size = std::tuple_size_v<std::remove_reference_t<decltype(t)>>;
     auto f = [&] <auto i=0> (const auto& fref) constexpr {
         if constexpr (i < tupl_size) {
@@ -248,7 +261,7 @@ constexpr auto find1_tuple(auto&& t, const auto& filter_fn, const auto& fn) {
 
     return f(f);
 }
-
+*/
 
 // Overload
 template<typename... Ts> struct overloaded : Ts... { using Ts::operator()...; };

@@ -7,7 +7,8 @@
 #include "../SmartVector.hpp"
 
 enum Form {
-    Triangle
+    Triangle,
+    Square
 };
 
 template<Form f>
@@ -17,6 +18,8 @@ struct Form2D {
     inline static uint32_t VAO;
     inline static uint32_t vertex_VBO;
     inline static uint32_t transform_VBO;
+    inline static uint32_t draw_type;
+    inline static std::initializer_list<float> vertices;
     
     std::list<Form2D*>::iterator formptr_list_it;
 
